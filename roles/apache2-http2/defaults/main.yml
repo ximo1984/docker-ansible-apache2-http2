@@ -1,0 +1,63 @@
+---
+apache_repository: "ppa:ondrej/apache2"
+
+apache_listen_ip: "*"
+apache_listen_port: 80
+apache_listen_port_ssl: 443
+
+apache_create_vhosts: true
+apache_vhosts_filename: "vhosts.conf"
+apache_vhosts_template: "vhosts.conf.j2"
+
+# On Debian/Ubuntu, a default virtualhost is included in Apache's configuration.
+# Set this to `true` to remove that default.
+apache_remove_default_vhost: true
+
+apache_global_vhost_settings: |
+  DirectoryIndex index.php index.html
+
+# apache properties
+apache_vhosts:
+  - servername: "localhost"
+    documentroot: "/var/www/html"
+    extra_parameters: |
+      Redirect permanent "/" "https://localhost"
+
+apache_allow_override: "All"
+apache_options: "-Indexes +FollowSymLinks"
+
+apache_vhosts_ssl: 
+  - servername: "localhost"
+    documentroot: "/var/www/html"
+    certificate_file: "/etc/ssl/certs/ssl-cert-snakeoil.pem"
+    certificate_key_file: "/etc/ssl/private/ssl-cert-snakeoil.key"
+    extra_parameters: |
+      Protocols h2 h2c http/1.1
+
+apache_ignore_missing_ssl_certificate: true
+
+apache_mods_enabled:
+  - mpm_event 
+  - headers 
+  - expires 
+  - auth_digest 
+  - ssl 
+  - proxy 
+  - proxy_http 
+  - proxy_fcgi 
+  - setenvif 
+  - rewrite 
+  - http2
+apache_mods_disabled:
+  - mpm_prefork
+
+# Set initial apache state. Recommended values: `started` or `stopped`
+apache_state: started
+
+# Set apache state when configuration changes are made. Recommended values:
+# `restarted` or `reloaded`
+apache_restart_state: restarted
+
+# Apache package state; use `present` to make sure it's installed, or `latest`
+# if you want to upgrade or switch versions using a new repo.
+apache_packages_state: present

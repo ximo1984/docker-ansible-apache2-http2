@@ -1,0 +1,29 @@
+---
+- name: Include Ubuntu variables.
+  include_vars: "ubuntu.yml"
+
+- name: Add apache repository.
+  apt_repository:
+    repo: "{{ apache_repository }}"
+  when: apache_repository is defined
+
+- name: Define apache_packages.
+  set_fact:
+    apache_packages: "{{ __apache_packages | list }}"
+  when: apache_packages is not defined
+
+- include_tasks: "setup-ubuntu.yml"
+
+- name: Include Apache 2.4 variables.
+  include_vars: apache-24.yml
+
+- name: Configure Apache.
+  include_tasks: "configure-ubuntu.yml"
+
+- name: Put runtime programs.
+  copy:
+    src: docker-entrypoint.sh
+    dest: /usr/local/bin/docker-entrypoint.sh
+    mode: 0755
+    owner: root
+    group: root
